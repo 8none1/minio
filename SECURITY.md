@@ -8,7 +8,10 @@ fork. Reports sent there will not reach the people who maintain it.
 
 ## Reporting a Vulnerability
 
-Please email **security@chainguard.dev** with:
+Please use GitHub's private vulnerability reporting on this repository
+(**Security → Report a vulnerability**, or
+https://github.com/chainguard-forks/minio/security/advisories/new), or email
+**security@chainguard.dev**. Either way, please include:
 
 - a description of the issue and the affected component or code path
 - reproduction steps, including whether valid credentials are needed
