@@ -1,42 +1,41 @@
 # Security Policy
 
-## Supported Versions
-
-We always provide security updates for the [latest release](https://github.com/minio/minio/releases/latest).
-Whenever there is a security update you just need to upgrade to the latest version.
+This repository is Chainguard's [EmeritOSS](https://www.chainguard.dev/unchained/introducing-chainguard-emeritoss)
+fork of MinIO. Upstream `minio/minio` is archived, and the contact addresses in
+the original MinIO security policy (`security@min.io` and the individual
+coordinators listed there) are **not** the right place to report issues in this
+fork. Reports sent there will not reach the people who maintain it.
 
 ## Reporting a Vulnerability
 
-All security bugs in [minio/minio](https://github,com/minio/minio) (or other minio/* repositories)
-should be reported by email to security@min.io. Your email will be acknowledged within 48 hours,
-and you'll receive a more detailed response to your email within 72 hours indicating the next steps
-in handling your report.
+Please email **security@chainguard.dev** with:
 
-Please, provide a detailed explanation of the issue. In particular, outline the type of the security
-issue (DoS, authentication bypass, information disclose, ...) and the assumptions you're making (e.g. do
-you need access credentials for a successful exploit).
+- a description of the issue and the affected component or code path
+- reproduction steps, including whether valid credentials are needed
+- the release or commit you tested against (`minio --version`)
 
-If you have not received a reply to your email within 48 hours or you have not heard from the security team
-for the past five days please contact the security team directly:
+Please do not open a public GitHub issue for security reports. Issues and pull
+requests on this repository are closed to the community.
 
-- Primary security coordinator: aead@min.io
-- Secondary coordinator: harsha@min.io
-- If you receive no response: dev@min.io
+Chainguard's general security policy is at https://github.com/chainguard-dev/.github/blob/main/SECURITY.md.
 
-### Disclosure Process
+## Supported Versions
 
-MinIO uses the following disclosure process:
+Only the latest release of this fork is maintained. Fixes are shipped as a new
+release of this repository and as updates to the Chainguard `minio` and
+`minio-fips` container images. Published advisories for those images are at
+https://images.chainguard.dev/security.
 
-1. Once the security report is received one member of the security team tries to verify and reproduce
-   the issue and determines the impact it has.
-2. A member of the security team will respond and either confirm or reject the security report.
-   If the report is rejected the response explains why.
-3. Code is audited to find any potential similar problems.
-4. Fixes are prepared for the latest release.
-5. On the date that the fixes are applied a security advisory will be published on <https://blog.min.io>.
-   Please inform us in your report email whether MinIO should mention your contribution w.r.t. fixing
-   the security issue. By default MinIO will **not** publish this information to protect your privacy.
+## Scope
 
-This process can take some time, especially when coordination is required with maintainers of other projects.
-Every effort will be made to handle the bug in as timely a manner as possible, however it's important that we
-follow the process described above to ensure that disclosures are handled consistently.
+Maintenance is best effort, as described in the README: dependency
+vulnerabilities are updated regularly, and vulnerabilities in the project's own
+source code are fixed when that can be done safely and with minimal risk. Fixes
+that would require extensive changes may not be made. There is no service level
+agreement on this fork.
+
+## Disclosure
+
+Chainguard's product security team coordinates validation, the fix, CVE
+assignment where appropriate, and disclosure. Please allow reasonable time for a
+fix to ship before publishing details.
