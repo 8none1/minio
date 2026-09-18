@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       matrix:
-        go-version: [1.25.x]
+        go-version: [1.26.x]
         os: [ubuntu-latest]
     steps:
       - name: Harden the runner (Audit all outbound calls)
