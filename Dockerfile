@@ -1,8 +1,9 @@
 # MinIO's own images have been removed from Docker Hub, so the runtime image is
 # built on Chainguard's wolfi-base. coreutils provides the GNU chroot --userspec
-# used by docker-entrypoint.sh and the GNU head/tail options used by the tests.
+# used by docker-entrypoint.sh and the GNU head/tail options used by the tests;
+# mc (from Wolfi) is what the compose healthchecks run ("mc ready local").
 FROM cgr.dev/chainguard/wolfi-base:latest
-RUN apk add --no-cache coreutils ca-certificates-bundle
+RUN apk add --no-cache coreutils ca-certificates-bundle mc
 
 ARG TARGETARCH
 ARG RELEASE

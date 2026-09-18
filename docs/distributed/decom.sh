@@ -70,6 +70,9 @@ sleep 30
 ./mc ls -r --versions mytier/tiered/ >tiered_ns_versions.txt
 
 kill $pid
+# Let the old process exit before restarting on the same ports; otherwise
+# "mc ready" below can pass against it and the next commands hit the restart.
+sleep 5
 
 (minio server http://localhost:9000/tmp/xl/{1...10}/disk{0...1} http://localhost:9001/tmp/xl/{11...30}/disk{0...3} 2>&1 >/tmp/expanded_1.log) &
 pid_1=$!
