@@ -1,13 +1,21 @@
-FROM minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+# MinIO's own images have been removed from Docker Hub, so the runtime image is
+# built on Chainguard's wolfi-base. coreutils provides the GNU chroot --userspec
+# used by docker-entrypoint.sh and the GNU head/tail options used by the tests;
+# mc (from Wolfi) is what the compose healthchecks run ("mc ready local"); and
+# bash is installed as /bin/sh because, as on the previous base, the tests drive
+# the containers with "/bin/sh -c" scripts that rely on brace expansion.
+FROM cgr.dev/chainguard/wolfi-base:latest
+RUN apk add --no-cache bash coreutils ca-certificates-bundle mc && \
+    ln -sf /bin/bash /bin/sh
 
-ARG TARGETARCH
-ARG RELEASE
-
+# This Dockerfile is only used by "make docker", which packages the binary that
+# "make build" has just written to ./minio (the upgrade and mint tests use the
+# resulting image). It used to expect signed release artefacts named
+# minio-<arch>.<RELEASE>, which nothing in this repository produces; release
+# images are built elsewhere.
 RUN chmod -R 777 /usr/bin
 
-COPY ./minio-${TARGETARCH}.${RELEASE} /usr/bin/minio
-COPY ./minio-${TARGETARCH}.${RELEASE}.minisig /usr/bin/minio.minisig
-COPY ./minio-${TARGETARCH}.${RELEASE}.sha256sum /usr/bin/minio.sha256sum
+COPY ./minio /usr/bin/minio
 
 COPY dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 

@@ -16,7 +16,10 @@ fi
 
 function download_old_release() {
 	if [ ! -f minio.RELEASE.2020-10-28T08-16-50Z ]; then
-		curl --silent --max-time 300 -fL -o minio.RELEASE.2020-10-28T08-16-50Z https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2020-10-28T08-16-50Z
+		# Historical binary hosted on this repository's "ci-fixtures" release
+		# (dl.min.io is gone); verified against the digest recorded there.
+		curl --silent --max-time 300 -fL -o minio.RELEASE.2020-10-28T08-16-50Z https://github.com/chainguard-forks/minio/releases/download/ci-fixtures/minio.linux-amd64.RELEASE.2020-10-28T08-16-50Z
+		echo "2c7e6774a9befbba6a126791f363550f8f14e34008e100d0e0e57e2ad9b2ab8c  minio.RELEASE.2020-10-28T08-16-50Z" | sha256sum -c -
 		chmod a+x minio.RELEASE.2020-10-28T08-16-50Z
 	fi
 }

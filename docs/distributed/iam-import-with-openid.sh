@@ -16,11 +16,10 @@ export MC_HOST_myminio1="http://dillon-service-2:dillon-service-2@localhost:2200
 export CI=true
 
 if [ ! -f ./mc ]; then
-	wget --quiet -O mc https://dl.minio.io/client/mc/release/linux-amd64/mc &&
-		chmod +x mc
+	"$(git rev-parse --show-toplevel)/buildscripts/install-mc.sh" mc
 fi
 
-mc -v
+./mc --version
 
 # Start openid server
 (
@@ -45,6 +44,9 @@ mc -v
 	role_policy="consoleAdmin"
 
 ./mc admin service restart myminio --json
+# Give the server a moment to actually go down; otherwise "mc ready" can
+# succeed against the old process and the import below hits the restart.
+sleep 5
 ./mc ready myminio
 ./mc admin cluster iam import myminio docs/distributed/samples/myminio-iam-info-openid.zip
 

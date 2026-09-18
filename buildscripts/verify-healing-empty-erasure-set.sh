@@ -129,8 +129,7 @@ function __init__() {
 	echo '{"version": "3", "credential": {"accessKey": "minio", "secretKey": "minio123"}, "region": "us-east-1"}' >"$MINIO_CONFIG_DIR/config.json"
 
 	if [ ! -f /tmp/mc ]; then
-		wget --quiet --timeout=300 -O /tmp/mc https://dl.minio.io/client/mc/release/linux-amd64/mc &&
-			chmod +x /tmp/mc
+		"$(git rev-parse --show-toplevel)/buildscripts/install-mc.sh" /tmp/mc
 	fi
 }
 
