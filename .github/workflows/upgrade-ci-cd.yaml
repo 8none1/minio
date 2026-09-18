@@ -18,6 +18,9 @@ jobs:
   build:
     name: Go ${{ matrix.go-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    # The upgrade script loops waiting for the cluster; never let a hang run for
+    # the default six hours.
+    timeout-minutes: 60
     strategy:
       matrix:
         go-version: [1.25.x]

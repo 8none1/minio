@@ -1,0 +1,15 @@
+# syntax=docker/dockerfile:1
+#
+# "Old" MinIO server image for the upgrade test. MinIO has removed its images
+# from Docker Hub and quay.io no longer carries the historical tags, so the
+# test builds its starting point from a historical server binary hosted on
+# this repository's "ci-fixtures" release, verified by digest.
+FROM cgr.dev/chainguard/wolfi-base:latest
+ARG RELEASE
+ARG SHA256
+RUN apk add --no-cache ca-certificates-bundle
+ADD --checksum=sha256:${SHA256} --chmod=755 \
+    https://github.com/chainguard-forks/minio/releases/download/ci-fixtures/minio.linux-amd64.${RELEASE} /usr/bin/minio
+EXPOSE 9000
+VOLUME ["/data"]
+ENTRYPOINT ["/usr/bin/minio"]

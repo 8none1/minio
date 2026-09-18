@@ -78,9 +78,18 @@ __init__() {
 
 	TAG=minio/minio:dev make docker
 
-	MINIO_VERSION=RELEASE.2019-12-19T22-52-26Z docker-compose \
+	# The old server image used to be pulled from Docker Hub, which MinIO has
+	# taken down. Build it locally from a historical binary hosted on this
+	# repository's ci-fixtures release instead.
+	OLD_RELEASE=RELEASE.2020-10-28T08-16-50Z
+	OLD_SHA256=2c7e6774a9befbba6a126791f363550f8f14e34008e100d0e0e57e2ad9b2ab8c
+	docker build -q -t "minio/minio:${OLD_RELEASE}" \
+		--build-arg "RELEASE=${OLD_RELEASE}" --build-arg "SHA256=${OLD_SHA256}" \
+		-f buildscripts/upgrade-tests/Dockerfile.old buildscripts/upgrade-tests
+
+	MINIO_VERSION=${OLD_RELEASE} docker-compose \
 		-f "buildscripts/upgrade-tests/compose.yml" \
-		up -d --build
+		up -d
 
 	add_alias
 
