@@ -14,7 +14,9 @@
 # `_MINIO_LDAP_TEST_SERVER`.
 
 OLD_VERSION=RELEASE.2024-03-26T22-10-45Z
-OLD_BINARY_LINK=https://github.com/minio/minio/releases/download/${OLD_VERSION}/minio.linux-amd64.${OLD_VERSION}
+# Historical binary hosted on this repository's "ci-fixtures" release (dl.min.io is gone).
+OLD_BINARY_LINK=https://github.com/chainguard-forks/minio/releases/download/ci-fixtures/minio.linux-amd64.${OLD_VERSION}
+OLD_BINARY_SHA256=2050199d89e3057571620a1d453118fed5bd2de9d4f3b266b11365fdf984d676
 
 __init__() {
 	if which curl &>/dev/null; then
@@ -36,7 +38,8 @@ __init__() {
 
 	if [ ! -x ./minio.${OLD_VERSION} ]; then
 		echo "Downloading minio.${OLD_VERSION} binary"
-		curl -o minio.${OLD_VERSION} ${OLD_BINARY_LINK}
+		curl -fL -o minio.${OLD_VERSION} ${OLD_BINARY_LINK}
+		echo "${OLD_BINARY_SHA256}  minio.${OLD_VERSION}" | sha256sum -c -
 		chmod +x minio.${OLD_VERSION}
 	fi
 

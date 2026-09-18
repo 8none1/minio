@@ -50,8 +50,10 @@ go install -v github.com/minio/mc@master
 cp -a $(go env GOPATH)/bin/mc ./mc
 
 if [ ! -f mc.RELEASE.2021-03-12T03-36-59Z ]; then
-	# Old client used for compatibility testing; dl.min.io is gone, fetch the GitHub release asset.
-	wget -q -O mc.RELEASE.2021-03-12T03-36-59Z https://github.com/minio/mc/releases/download/RELEASE.2021-03-12T03-36-59Z/mc.linux-amd64.RELEASE.2021-03-12T03-36-59Z &&
+	# Old client used for compatibility testing. dl.min.io is gone, so this is
+	# hosted on this repository's "ci-fixtures" release and verified by digest.
+	wget -q -O mc.RELEASE.2021-03-12T03-36-59Z https://github.com/chainguard-forks/minio/releases/download/ci-fixtures/mc.linux-amd64.RELEASE.2021-03-12T03-36-59Z &&
+		echo "8296d4aa02a4cd9cb812bae4d0f65a2bb4003e1475192dcfc1fd42a726250ffa  mc.RELEASE.2021-03-12T03-36-59Z" | sha256sum -c - &&
 		chmod +x mc.RELEASE.2021-03-12T03-36-59Z
 fi
 
