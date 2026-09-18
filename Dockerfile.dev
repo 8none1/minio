@@ -14,7 +14,11 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -o minio .
 
 # Final stage
-FROM minio/minio:latest
+# MinIO's own images have been removed from Docker Hub, so the runtime image is
+# built on Chainguard's wolfi-base. coreutils provides the GNU chroot --userspec
+# used by docker-entrypoint.sh and the GNU head/tail options used by the tests.
+FROM cgr.dev/chainguard/wolfi-base:latest
+RUN apk add --no-cache coreutils ca-certificates-bundle
 
 RUN chmod -R 777 /usr/bin
 

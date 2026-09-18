@@ -1,4 +1,8 @@
-FROM minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+# MinIO's own images have been removed from Docker Hub, so the runtime image is
+# built on Chainguard's wolfi-base. coreutils provides the GNU chroot --userspec
+# used by docker-entrypoint.sh and the GNU head/tail options used by the tests.
+FROM cgr.dev/chainguard/wolfi-base:latest
+RUN apk add --no-cache coreutils ca-certificates-bundle
 
 ARG TARGETARCH
 ARG RELEASE
