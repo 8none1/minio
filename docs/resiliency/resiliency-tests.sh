@@ -412,15 +412,7 @@ function main() {
 			exit 1
 			;;
 		esac
-		MC_URL="https://dl.minio.io/client/mc/release/${OS}-${ARCH}/mc"
-		if command -v wget &>/dev/null; then
-			wget -q "$MC_URL" && chmod +x ./mc
-		elif command -v curl &>/dev/null; then
-			curl -sSL "$MC_URL" -o ./mc && chmod +x ./mc
-		else
-			echo "Neither wget nor curl found. Please install one of them."
-			exit 1
-		fi
+		"$(git rev-parse --show-toplevel)/buildscripts/install-mc.sh" ./mc
 	fi
 
 	export MC_HOST_myminio=http://minioadmin:minioadmin@localhost:9000
