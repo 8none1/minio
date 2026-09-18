@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Stop at the first failure rather than carrying on into steps that then wait
+# forever for a cluster that never came up.
+set -e
+
 trap 'cleanup $LINENO' ERR
 
 # shellcheck disable=SC2120

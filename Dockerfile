@@ -8,14 +8,14 @@ FROM cgr.dev/chainguard/wolfi-base:latest
 RUN apk add --no-cache bash coreutils ca-certificates-bundle mc && \
     ln -sf /bin/bash /bin/sh
 
-ARG TARGETARCH
-ARG RELEASE
-
+# This Dockerfile is only used by "make docker", which packages the binary that
+# "make build" has just written to ./minio (the upgrade and mint tests use the
+# resulting image). It used to expect signed release artefacts named
+# minio-<arch>.<RELEASE>, which nothing in this repository produces; release
+# images are built elsewhere.
 RUN chmod -R 777 /usr/bin
 
-COPY ./minio-${TARGETARCH}.${RELEASE} /usr/bin/minio
-COPY ./minio-${TARGETARCH}.${RELEASE}.minisig /usr/bin/minio.minisig
-COPY ./minio-${TARGETARCH}.${RELEASE}.sha256sum /usr/bin/minio.sha256sum
+COPY ./minio /usr/bin/minio
 
 COPY dockerscripts/docker-entrypoint.sh /usr/bin/docker-entrypoint.sh
 
