@@ -250,7 +250,7 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 	// With the unsigned x-amz-* check in extractSignedHeaders this cannot fail
 	// for a header that arrived off the wire (Go canonicalises every header
 	// name, so any X-Amz-Meta-* present is necessarily in the signed set and
-	// carries its own value). It is kept as defence in depth for callers that
+	// carries its own value). It is kept as defense in depth for callers that
 	// construct requests in-process with non-canonical header keys.
 	errMetaCode := checkMetaHeaders(extractedSignedHeaders, r)
 	if errMetaCode != ErrNone {
