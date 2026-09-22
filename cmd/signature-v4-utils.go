@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/http"
 	"slices"
@@ -217,7 +218,13 @@ func extractSignedHeaders(signedHeaders []string, r *http.Request) (http.Header,
 	//
 	// x-amz-content-sha256 is exempt: its value is bound into the canonical
 	// request as the payload hash, so tampering with it already fails
-	// signature verification.
+	// signature verification. Note that this header also selects the verifier:
+	// getRequestAuthType dispatches on its STREAMING-* sentinel values before
+	// any signature is checked. An unsigned sentinel added to a presigned URL
+	// therefore re-routes the request to a streaming verifier, and it is that
+	// verifier's requirement for an Authorization header (which a presigned
+	// request does not carry) that makes it fail closed, not the payload-hash
+	// binding. TestSigV4RejectsUnsignedAmzHeaders pins this.
 	signedSet := make(map[string]struct{}, len(signedHeaders))
 	for _, header := range signedHeaders {
 		signedSet[strings.ToLower(header)] = struct{}{}
@@ -228,6 +235,9 @@ func extractSignedHeaders(signedHeaders []string, r *http.Request) (http.Header,
 			continue
 		}
 		if _, ok := signedSet[lowerHeader]; !ok {
+			// Log the header name (never its value) so that a proxy adding its
+			// own x-amz-* headers after the client has signed can be identified.
+			logger.LogIf(r.Context(), "signature", fmt.Errorf("request carries unsigned header %s; Signature V4 requires every x-amz-* header to be signed", header))
 			return nil, ErrUnsignedHeaders
 		}
 	}

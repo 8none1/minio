@@ -94,8 +94,9 @@ func TestSigV4RejectsUnsignedAmzHeaders(t *testing.T) {
 		if req.Header.Get(amzSignatureAge) == "" {
 			t.Fatalf("expected %s to be set after verification", amzSignatureAge)
 		}
-		// ... and a second verification of the same request (PutObject verifies
-		// twice) must still pass despite that server-set x-amz-* header.
+		// ... and a second verification of the same request (CopyObject and
+		// CopyObjectPart authenticate destination then source) must still pass
+		// despite that server-set x-amz-* header.
 		if code := verify(req); code != ErrNone {
 			t.Fatalf("re-verification of presigned request: got %v, want ErrNone", code)
 		}
@@ -297,6 +298,25 @@ func testAPIUnsignedCopySourceOnPresignedPut(obj ObjectLayer, instanceType, buck
 	req := newPresignedPut()
 	req.Header.Set(xhttp.AmzCopySource, copySource)
 	expectRejected("presigned PUT with unsigned x-amz-copy-source", serve(req))
+
+	// 2b. x-amz-content-sha256 is exempt from the unsigned check, but its
+	// STREAMING-* sentinel values select the verifier (getRequestAuthType) before
+	// any signature is checked. An unsigned sentinel on a presigned URL re-routes
+	// the request to a streaming verifier, which must still fail closed: those
+	// verifiers require an Authorization header, which a presigned request does
+	// not carry. Pin that invariant so a change to the chunked readers cannot
+	// silently turn a presigned URL into an unauthenticated streaming upload.
+	for _, sentinel := range []string{streamingContentSHA256, streamingContentSHA256Trailer, unsignedPayloadTrailer} {
+		req := newPresignedPut()
+		req.Header.Set(xhttp.AmzContentSha256, sentinel)
+		name := "presigned PUT with unsigned x-amz-content-sha256=" + sentinel
+		if rec := serve(req); rec.Code == http.StatusOK {
+			t.Errorf("%s: %s: got HTTP 200, want rejection; body: %s", instanceType, name, rec.Body)
+		}
+		if got := readBack(bucketName, targetObject); !bytes.Equal(got, original) {
+			t.Errorf("%s: %s: target object was modified: got %q, want %q", instanceType, name, got, original)
+		}
+	}
 
 	// 3. Same thing on the Authorization-header path: sign, then add the header.
 	req, err := newTestSignedRequestV4(http.MethodPut, targetURL, int64(len(original)), bytes.NewReader(original),

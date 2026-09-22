@@ -59,10 +59,16 @@ const (
 
 // amzSignatureAge is a server-internal request header. doesPresignedSignatureMatch
 // sets it once a presigned request has verified, and bucket policy evaluation reads
-// it for the signatureAge condition. The client is never allowed to supply it, so it
-// is dropped before verification. Dropping it also means a second verification of
-// the same request (PutObject verifies the signature again for the payload hash)
-// does not trip the unsigned x-amz-* header check in extractSignedHeaders.
+// it for the signatureAge condition (see getConditionValues).
+//
+// The SigV4 verifiers drop it before verifying, for two reasons. First, a value
+// supplied by the client must not survive into a verified request: policy is
+// evaluated by isPutActionAllowed before any verifier runs, so this only holds at
+// the verifier boundary, but from there on the header is server-owned. Second,
+// some handlers verify the same request more than once (CopyObject and
+// CopyObjectPart authenticate the destination and then the source); without the
+// Del, the header set by the first verification would trip the unsigned x-amz-*
+// header check in extractSignedHeaders on the second.
 const amzSignatureAge = "x-amz-signature-age"
 
 // getCanonicalHeaders generate a list of request headers with their values
@@ -240,7 +246,12 @@ func doesPresignedSignatureMatch(hashedPayload string, r *http.Request, region s
 		return errCode
 	}
 
-	// Check if the metadata headers are equal with signedheaders
+	// Check if the metadata headers are equal with signedheaders.
+	// With the unsigned x-amz-* check in extractSignedHeaders this cannot fail
+	// for a header that arrived off the wire (Go canonicalises every header
+	// name, so any X-Amz-Meta-* present is necessarily in the signed set and
+	// carries its own value). It is kept as defence in depth for callers that
+	// construct requests in-process with non-canonical header keys.
 	errMetaCode := checkMetaHeaders(extractedSignedHeaders, r)
 	if errMetaCode != ErrNone {
 		return errMetaCode
